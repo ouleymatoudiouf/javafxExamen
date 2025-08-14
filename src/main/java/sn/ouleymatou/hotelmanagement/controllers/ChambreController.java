@@ -163,6 +163,8 @@ public class ChambreController implements Initializable {
                     showAlert(Alert.AlertType.INFORMATION, "Succès", null, "Chambre supprimée.");
                 } catch (IllegalStateException ex) {
                     showAlert(Alert.AlertType.ERROR, "Erreur", null, ex.getMessage());
+                } catch (RuntimeException ex) {
+                    showAlert(Alert.AlertType.ERROR, "Erreur", null, "Erreur lors de la suppression : " + ex.getMessage());
                 }
             }
         });

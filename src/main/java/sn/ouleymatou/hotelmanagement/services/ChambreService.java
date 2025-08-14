@@ -44,53 +44,81 @@ public class ChambreService {
         }
     }
 
-    public void supprimer(Chambre chambre) {
+    public void supprimerChambre(Long chambreId) {
         EntityManager em = JPAUtils.getEntityManager();
         EntityTransaction tx = em.getTransaction();
+
         try {
             tx.begin();
-            Chambre c = em.find(Chambre.class, chambre.getId());
-            if (c != null) {
-                em.remove(c);
-            }
+            Chambre chambre = em.find(Chambre.class, chambreId);
+            if (chambre == null) throw new IllegalArgumentException("Chambre non trouvée.");
+
+            TypedQuery<Long> query = em.createQuery(
+                    "SELECT COUNT(r) FROM Reservation r WHERE r.chambre = :chambre AND r.dateArrivee >= :aujourdHui AND r.statut != :annule",
+                    Long.class
+            );
+            query.setParameter("chambre", chambre);
+            query.setParameter("aujourdHui", LocalDate.now());
+            query.setParameter("annule", Reservation.StatutReservation.ANNULEE);
+
+            Long countReservationsFutures = query.getSingleResult();
+            if (countReservationsFutures > 0)
+                throw new IllegalStateException("Impossible de supprimer la chambre car elle a des réservations futures.");
+
+            em.remove(chambre);
             tx.commit();
         } catch (Exception e) {
             if (tx.isActive()) tx.rollback();
-            throw new RuntimeException("Erreur lors de la suppression", e);
+            throw new RuntimeException("Erreur lors de la suppression de la chambre : " + e.getMessage(), e);
         } finally {
-            if (em != null) em.close();
+            em.close();
         }
     }
 
-    public List<Chambre> filtrer(String libelleType, String statutStr) {
+    // Méthode pour compatibilité avec le controller
+    public void supprimer(Chambre chambre) {
+        if (chambre != null) {
+            supprimerChambre(chambre.getId());
+        }
+    }
+
+    public List<Chambre> getChambresDisponibles(LocalDateTime dateArrivee, LocalDateTime dateDepart) {
         EntityManager em = JPAUtils.getEntityManager();
         try {
-            StringBuilder jpql = new StringBuilder("SELECT c FROM Chambre c WHERE 1=1");
-            if (!"Tous".equals(libelleType)) {
-                jpql.append(" AND c.typeChambre.libelle = :libelleType");
-            }
-            if (!"Tous".equals(statutStr)) {
-                jpql.append(" AND c.statut = :statut");
-            }
-
-            TypedQuery<Chambre> query = em.createQuery(jpql.toString(), Chambre.class);
-            if (!"Tous".equals(libelleType)) {
-                query.setParameter("libelleType", libelleType);
-            }
-            if (!"Tous".equals(statutStr)) {
-                query.setParameter("statut", Chambre.StatutChambre.valueOf(statutStr));
-            }
-
+            String jpql = "SELECT c FROM Chambre c WHERE c.statut = :statut AND " +
+                    "c.id NOT IN (SELECT r.chambre.id FROM Reservation r WHERE " +
+                    "(:dateArrivee < r.dateDepart AND :dateDepart > r.dateArrivee))";
+            TypedQuery<Chambre> query = em.createQuery(jpql, Chambre.class);
+            query.setParameter("statut", Chambre.StatutChambre.LIBRE);
+            query.setParameter("dateArrivee", dateArrivee);
+            query.setParameter("dateDepart", dateDepart);
             return query.getResultList();
         } finally {
             if (em != null) em.close();
         }
     }
 
-    public String genererNumero(TypeChambre type, int etage) {
-        if (type == null || type.getCode() == null) {
-            throw new IllegalArgumentException("Le type de chambre est requis pour générer un numéro.");
+    public Chambre findById(Long id) {
+        EntityManager em = JPAUtils.getEntityManager();
+        try {
+            return em.find(Chambre.class, id);
+        } finally {
+            if (em != null) em.close();
         }
+    }
+
+    public void ajouter(Chambre chambre) {
+        if (chambre == null) throw new IllegalArgumentException("La chambre ne peut pas être nulle.");
+        if (chambre.getNumero() == null || chambre.getNumero().isEmpty()) {
+            chambre.setNumero(genererNumero(chambre.getTypeChambre(), chambre.getEtage()));
+        }
+        if (chambre.getStatut() == null) chambre.setStatut(Chambre.StatutChambre.LIBRE);
+        save(chambre);
+    }
+
+    public String genererNumero(TypeChambre type, int etage) {
+        if (type == null || type.getCode() == null)
+            throw new IllegalArgumentException("Le type de chambre est requis pour générer un numéro.");
 
         String typeCode = type.getCode().toUpperCase();
         String prefix = "CH";
@@ -115,29 +143,6 @@ public class ChambreService {
         return String.format("%s-%s-%s-%03d", prefix, typeCode, etageStr, maxSeq + 1);
     }
 
-    public Chambre findById(Long id) {
-        EntityManager em = JPAUtils.getEntityManager();
-        try {
-            return em.find(Chambre.class, id);
-        } finally {
-            if (em != null) em.close();
-        }
-    }
-
-    public void ajouter(Chambre chambre) {
-        if (chambre == null) throw new IllegalArgumentException("La chambre ne peut pas être nulle.");
-
-        if (chambre.getNumero() == null || chambre.getNumero().isEmpty()) {
-            chambre.setNumero(genererNumero(chambre.getTypeChambre(), chambre.getEtage()));
-        }
-
-        if (chambre.getStatut() == null) {
-            chambre.setStatut(Chambre.StatutChambre.LIBRE);
-        }
-
-        save(chambre);
-    }
-
     public Chambre findByNumero(String numero) {
         EntityManager em = JPAUtils.getEntityManager();
         try {
@@ -147,58 +152,7 @@ public class ChambreService {
         } catch (NoResultException e) {
             return null;
         } finally {
-            if (em != null) em.close();
-        }
-    }
-
-    // Méthode mise à jour pour LocalDateTime
-    public List<Chambre> getChambresDisponibles(LocalDateTime dateArrivee, LocalDateTime dateDepart) {
-        EntityManager em = JPAUtils.getEntityManager();
-        try {
-            String jpql = "SELECT c FROM Chambre c WHERE c.statut = :statut " +
-                    "AND c.id NOT IN (SELECT r.chambre.id FROM Reservation r WHERE " +
-                    "(:dateArrivee < r.dateDepart AND :dateDepart > r.dateArrivee))";
-            TypedQuery<Chambre> query = em.createQuery(jpql, Chambre.class);
-            query.setParameter("statut", Chambre.StatutChambre.LIBRE);
-            query.setParameter("dateArrivee", dateArrivee);
-            query.setParameter("dateDepart", dateDepart);
-            return query.getResultList();
-        } finally {
-            if (em != null) em.close();
-        }
-    }
-
-    public void supprimerChambre(Long chambreId) {
-        EntityManager em = JPAUtils.getEntityManager();
-        EntityTransaction tx = em.getTransaction();
-
-        try {
-            tx.begin();
-
-            Chambre chambre = em.find(Chambre.class, chambreId);
-            if (chambre == null) throw new IllegalArgumentException("Chambre non trouvée.");
-
-            TypedQuery<Long> query = em.createQuery(
-                    "SELECT COUNT(r) FROM Reservation r " +
-                            "WHERE r.chambre = :chambre AND r.dateArrivee >= :maintenant AND r.statut != :annule",
-                    Long.class);
-            query.setParameter("chambre", chambre);
-            query.setParameter("maintenant", LocalDateTime.now());
-            query.setParameter("annule", Reservation.StatutReservation.ANNULEE);
-
-            Long countReservationsFutures = query.getSingleResult();
-
-            if (countReservationsFutures > 0) {
-                throw new IllegalStateException("Impossible de supprimer la chambre car elle a des réservations futures.");
-            }
-
-            em.remove(chambre);
-            tx.commit();
-        } catch (Exception e) {
-            if (tx.isActive()) tx.rollback();
-            throw new RuntimeException("Erreur lors de la suppression de la chambre : " + e.getMessage(), e);
-        } finally {
-            if (em != null) em.close();
+            em.close();
         }
     }
 
@@ -217,24 +171,25 @@ public class ChambreService {
 
         try {
             tx.begin();
-
             Chambre chambreExistante = em.find(Chambre.class, chambreModifiee.getId());
-            if (chambreExistante == null) throw new IllegalArgumentException("Chambre non trouvée.");
+            if (chambreExistante == null)
+                throw new IllegalArgumentException("Chambre non trouvée.");
+
+            LocalDate aujourdHui = LocalDate.now();
 
             TypedQuery<Long> query = em.createQuery(
                     "SELECT COUNT(r) FROM Reservation r " +
-                            "WHERE r.chambre = :chambre AND r.dateArrivee >= :maintenant AND r.statut != :annule",
-                    Long.class);
+                            "WHERE r.chambre = :chambre AND r.dateArrivee >= :aujourdHui AND r.statut != :annule",
+                    Long.class
+            );
             query.setParameter("chambre", chambreExistante);
-            query.setParameter("maintenant", LocalDateTime.now());
+            query.setParameter("aujourdHui", aujourdHui);
             query.setParameter("annule", Reservation.StatutReservation.ANNULEE);
 
             Long countReservationsFutures = query.getSingleResult();
-            if (countReservationsFutures > 0) {
+            if (countReservationsFutures > 0)
                 throw new IllegalStateException("Impossible de modifier la chambre car elle a des réservations futures.");
-            }
 
-            // Modification des champs autorisés
             chambreExistante.setNumero(chambreModifiee.getNumero());
             chambreExistante.setTypeChambre(chambreModifiee.getTypeChambre());
             chambreExistante.setStatut(chambreModifiee.getStatut());
@@ -250,7 +205,34 @@ public class ChambreService {
             if (tx.isActive()) tx.rollback();
             throw new RuntimeException("Erreur lors de la modification de la chambre : " + e.getMessage(), e);
         } finally {
+            em.close();
+        }
+    }
+    public List<Chambre> filtrer(String type, String statut) {
+        EntityManager em = JPAUtils.getEntityManager();
+        try {
+            StringBuilder jpql = new StringBuilder("SELECT c FROM Chambre c WHERE 1=1");
+
+            if (type != null && !type.equals("Tous")) {
+                jpql.append(" AND c.typeChambre.libelle = :type");
+            }
+            if (statut != null && !statut.equals("Tous")) {
+                jpql.append(" AND c.statut = :statut");
+            }
+
+            TypedQuery<Chambre> query = em.createQuery(jpql.toString(), Chambre.class);
+
+            if (type != null && !type.equals("Tous")) {
+                query.setParameter("type", type);
+            }
+            if (statut != null && !statut.equals("Tous")) {
+                query.setParameter("statut", Chambre.StatutChambre.valueOf(statut));
+            }
+
+            return query.getResultList();
+        } finally {
             if (em != null) em.close();
         }
     }
+
 }

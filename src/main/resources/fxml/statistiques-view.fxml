@@ -1,14 +1,130 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.chart.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            fx:controller="fxml.StatistiquesView"
-            prefHeight="400.0" prefWidth="600.0">
+<BorderPane xmlns:fx="http://javafx.com/fxml"
+            fx:controller="sn.ouleymatou.hotelmanagement.controllers.StatistiquesController"
+            prefWidth="1000" prefHeight="700">
 
-</AnchorPane>
+    <!-- Top : Filtres temporels -->
+    <top>
+        <HBox spacing="20" style="-fx-background-color: #ecf0f1;">
+            <padding>
+                <Insets top="15" right="15" bottom="15" left="15"/>
+            </padding>
+            <Label text="Période :" style="-fx-font-weight: bold;"/>
+            <DatePicker fx:id="dateDebutPicker" promptText="Date début"/>
+            <DatePicker fx:id="dateFinPicker" promptText="Date fin"/>
+            <Button text="Appliquer filtre" onAction="#appliquerFiltre"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button text="Exporter PDF" onAction="#exporterPDF"/>
+        </HBox>
+    </top>
+
+    <!-- Center : Contenu principal -->
+    <VBox spacing="20">
+        <padding>
+            <Insets top="15" right="15" bottom="15" left="15"/>
+        </padding>
+
+        <!-- Cartes métriques -->
+        <GridPane hgap="20" vgap="20">
+            <columnConstraints>
+                <ColumnConstraints percentWidth="33"/>
+                <ColumnConstraints percentWidth="33"/>
+                <ColumnConstraints percentWidth="33"/>
+            </columnConstraints>
+            <rowConstraints>
+                <RowConstraints percentHeight="50"/>
+                <RowConstraints percentHeight="50"/>
+            </rowConstraints>
+
+            <!-- Ligne 1 -->
+            <VBox spacing="10" style="-fx-background-color: #3498db; -fx-background-radius: 10;">
+                <padding>
+                    <Insets top="15" right="15" bottom="15" left="15"/>
+                </padding>
+                <Label text="Chiffre d'affaires total" style="-fx-text-fill: white; -fx-font-weight: bold;"/>
+                <Label fx:id="chiffreAffairesLabel" text="0 FCFA" style="-fx-text-fill: white; -fx-font-size: 16px;"/>
+            </VBox>
+
+            <VBox spacing="10" style="-fx-background-color: #2ecc71; -fx-background-radius: 10;">
+                <padding>
+                    <Insets top="15" right="15" bottom="15" left="15"/>
+                </padding>
+                <Label text="Taux d'occupation moyen" style="-fx-text-fill: white; -fx-font-weight: bold;"/>
+                <Label fx:id="tauxOccupationLabel" text="0%" style="-fx-text-fill: white; -fx-font-size: 16px;"/>
+            </VBox>
+
+            <VBox spacing="10" style="-fx-background-color: #e67e22; -fx-background-radius: 10;">
+                <padding>
+                    <Insets top="15" right="15" bottom="15" left="15"/>
+                </padding>
+                <Label text="Chambre la plus réservée" style="-fx-text-fill: white; -fx-font-weight: bold;"/>
+                <Label fx:id="chambrePlusReserveeLabel" text="-" style="-fx-text-fill: white; -fx-font-size: 16px;"/>
+            </VBox>
+
+            <!-- Ligne 2 -->
+            <VBox spacing="10" style="-fx-background-color: #9b59b6; -fx-background-radius: 10;">
+                <padding>
+                    <Insets top="15" right="15" bottom="15" left="15"/>
+                </padding>
+                <Label text="Client le plus fidèle" style="-fx-text-fill: white; -fx-font-weight: bold;"/>
+                <Label fx:id="clientPlusFideleLabel" text="-" style="-fx-text-fill: white; -fx-font-size: 16px;"/>
+            </VBox>
+
+            <VBox spacing="10" style="-fx-background-color: #1abc9c; -fx-background-radius: 10;">
+                <padding>
+                    <Insets top="15" right="15" bottom="15" left="15"/>
+                </padding>
+                <Label text="Durée moyenne de séjour" style="-fx-text-fill: white; -fx-font-weight: bold;"/>
+                <Label fx:id="dureeMoyenneLabel" text="0 nuit(s)" style="-fx-text-fill: white; -fx-font-size: 16px;"/>
+            </VBox>
+
+            <VBox spacing="10" style="-fx-background-color: #c0392b; -fx-background-radius: 10;">
+                <padding>
+                    <Insets top="15" right="15" bottom="15" left="15"/>
+                </padding>
+                <Label text="Nombre d'annulations" style="-fx-text-fill: white; -fx-font-weight: bold;"/>
+                <Label fx:id="annulationsLabel" text="0" style="-fx-text-fill: white; -fx-font-size: 16px;"/>
+            </VBox>
+        </GridPane>
+
+        <!-- Graphiques -->
+        <HBox spacing="20">
+            <VBox spacing="10" prefWidth="33%">
+                <Label text="Évolution des réservations"/>
+                <LineChart fx:id="lineChartReservations" prefHeight="250">
+                    <xAxis>
+                        <CategoryAxis label="Mois"/>
+                    </xAxis>
+                    <yAxis>
+                        <NumberAxis label="Nombre"/>
+                    </yAxis>
+                </LineChart>
+            </VBox>
+
+            <VBox spacing="10" prefWidth="33%">
+                <Label text="Répartition par type de chambre"/>
+                <PieChart fx:id="pieChartTypeChambre" prefHeight="250"/>
+            </VBox>
+
+            <VBox spacing="10" prefWidth="33%">
+                <Label text="Occupation par mois"/>
+                <BarChart fx:id="barChartOccupation" prefHeight="250">
+                    <xAxis>
+                        <CategoryAxis label="Mois"/>
+                    </xAxis>
+                    <yAxis>
+                        <NumberAxis label="Taux (%)"/>
+                    </yAxis>
+                </BarChart>
+            </VBox>
+        </HBox>
+
+    </VBox>
+
+</BorderPane>

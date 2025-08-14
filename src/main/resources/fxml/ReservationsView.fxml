@@ -4,8 +4,6 @@
 <?import javafx.scene.control.*?>
 <?import javafx.geometry.Insets?>
 <?import javafx.geometry.Pos?>
-<?import javafx.collections.FXCollections?>
-<?import java.lang.String?>
 
 <BorderPane xmlns:fx="http://javafx.com/fxml"
             fx:controller="sn.ouleymatou.hotelmanagement.controllers.ReservationController">
@@ -30,9 +28,47 @@
             <!-- Onglets -->
             <TabPane fx:id="tabPaneReservations" tabClosingPolicy="UNAVAILABLE">
                 <tabs>
-                    <Tab text="Toutes les Reservations"/>
-                    <Tab text="Arrivees du Jour"/>
-                    <Tab text="Departs du Jour"/>
+                    <Tab text="Toutes les Reservations">
+                        <TableView fx:id="tableAllReservations" prefHeight="400">
+                            <columns>
+                                <TableColumn text="N° Reservation" fx:id="colNumReservationAll"/>
+                                <TableColumn text="Client" fx:id="colClientAll"/>
+                                <TableColumn text="Chambre" fx:id="colChambreAll"/>
+                                <TableColumn text="Arrivee" fx:id="colArriveeAll"/>
+                                <TableColumn text="Depart" fx:id="colDepartAll"/>
+                                <TableColumn text="Nuits" fx:id="colNuitsAll"/>
+                                <TableColumn text="Statut" fx:id="colStatutAll"/>
+                                <TableColumn text="Montant" fx:id="colMontantAll"/>
+                                <TableColumn text="Actions" fx:id="colActionsAll"/>
+                            </columns>
+                        </TableView>
+                    </Tab>
+                    <Tab text="Arrivees du Jour">
+                        <TableView fx:id="tableArriveesDuJour" prefHeight="400">
+                            <columns>
+                                <TableColumn text="N° Reservation" fx:id="colNumReservationArrivees"/>
+                                <TableColumn text="Client" fx:id="colClientArrivees"/>
+                                <TableColumn text="Chambre" fx:id="colChambreArrivees"/>
+                                <TableColumn text="Arrivee" fx:id="colArriveeArrivees"/>
+                                <TableColumn text="Depart" fx:id="colDepartArrivees"/>
+                                <TableColumn text="Nuits" fx:id="colNuitsArrivees"/>
+                                <TableColumn text="Montant" fx:id="colMontantArrivees"/>
+                            </columns>
+                        </TableView>
+                    </Tab>
+                    <Tab text="Departs du Jour">
+                        <TableView fx:id="tableDepartsDuJour" prefHeight="400">
+                            <columns>
+                                <TableColumn text="N° Reservation" fx:id="colNumReservationDeparts"/>
+                                <TableColumn text="Client" fx:id="colClientDeparts"/>
+                                <TableColumn text="Chambre" fx:id="colChambreDeparts"/>
+                                <TableColumn text="Arrivee" fx:id="colArriveeDeparts"/>
+                                <TableColumn text="Depart" fx:id="colDepartDeparts"/>
+                                <TableColumn text="Nuits" fx:id="colNuitsDeparts"/>
+                                <TableColumn text="Montant" fx:id="colMontantDeparts"/>
+                            </columns>
+                        </TableView>
+                    </Tab>
                 </tabs>
             </TabPane>
 
@@ -47,17 +83,7 @@
                 <TextField fx:id="heureFin" promptText="HH:mm" prefWidth="60"/>
 
                 <Label text="Statut:"/>
-                <ComboBox fx:id="statutFilter" prefWidth="150">
-                    <items>
-                        <FXCollections fx:factory="observableArrayList">
-                            <String fx:value="Tous"/>
-                            <String fx:value="Confirmee"/>
-                            <String fx:value="Annulee"/>
-                            <String fx:value="Check-in"/>
-                            <String fx:value="Check-out"/>
-                        </FXCollections>
-                    </items>
-                </ComboBox>
+                <ComboBox fx:id="statutFilter" prefWidth="150"/>
 
                 <Label text="Recherche:"/>
                 <TextField fx:id="recherche" promptText="Client, N° reservation, Chambre"/>
@@ -65,32 +91,6 @@
             </HBox>
         </VBox>
     </top>
-
-    <!-- Centre : ComboBox chambres + Tableau principal -->
-    <center>
-        <VBox spacing="10" alignment="TOP_LEFT" style="-fx-padding: 10;">
-            <!-- ComboBox pour sélectionner une chambre -->
-            <HBox spacing="10" alignment="CENTER_LEFT">
-                <Label text="Chambre:"/>
-                <ComboBox fx:id="chambreComboBox" prefWidth="200" promptText="Sélectionnez une chambre"/>
-            </HBox>
-
-            <!-- Tableau des réservations -->
-            <TableView fx:id="tableReservations" prefHeight="400">
-                <columns>
-                    <TableColumn text="N° Reservation" fx:id="colNumReservation"/>
-                    <TableColumn text="Client" fx:id="colClient"/>
-                    <TableColumn text="Chambre" fx:id="colChambre"/>
-                    <TableColumn text="Arrivee" fx:id="colArrivee"/>
-                    <TableColumn text="Depart" fx:id="colDepart"/>
-                    <TableColumn text="Nuits" fx:id="colNuits"/>
-                    <TableColumn text="Statut" fx:id="colStatut"/>
-                    <TableColumn text="Montant" fx:id="colMontant"/>
-                    <TableColumn text="Actions" fx:id="colActions"/>
-                </columns>
-            </TableView>
-        </VBox>
-    </center>
 
     <!-- Bas : Statistiques -->
     <bottom>
