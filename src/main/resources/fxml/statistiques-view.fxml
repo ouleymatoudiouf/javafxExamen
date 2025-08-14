@@ -1,120 +1,88 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.chart.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.scene.chart.BarChart?>
+<?import javafx.scene.chart.CategoryAxis?>
+<?import javafx.scene.chart.LineChart?>
+<?import javafx.scene.chart.NumberAxis?>
+<?import javafx.scene.chart.PieChart?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.ColumnConstraints?>
 
-<BorderPane xmlns:fx="http://javafx.com/fxml"
-            fx:controller="sn.ouleymatou.hotelmanagement.controllers.StatistiquesController"
-            prefWidth="1000" prefHeight="700">
-
-    <!-- Top : Filtres temporels -->
+<BorderPane xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="sn.ouleymatou.hotelmanagement.controllers.StatistiquesController">
     <top>
         <HBox spacing="20" style="-fx-background-color: #ecf0f1;">
             <padding>
-                <Insets top="15" right="15" bottom="15" left="15"/>
+                <Insets top="10" right="10" bottom="10" left="10"/>
             </padding>
-            <Label text="Période :" style="-fx-font-weight: bold;"/>
             <DatePicker fx:id="dateDebutPicker" promptText="Date début"/>
             <DatePicker fx:id="dateFinPicker" promptText="Date fin"/>
             <Button text="Appliquer filtre" onAction="#appliquerFiltre"/>
-            <Region HBox.hgrow="ALWAYS"/>
             <Button text="Exporter PDF" onAction="#exporterPDF"/>
         </HBox>
     </top>
+    <center>
+        <VBox spacing="20">
+            <padding>
+                <Insets top="15" right="15" bottom="15" left="15"/>
+            </padding>
+            <GridPane hgap="15" vgap="15">
+                <columnConstraints>
+                    <ColumnConstraints halignment="RIGHT"/>
+                    <ColumnConstraints halignment="LEFT"/>
+                </columnConstraints>
 
-    <!-- Center : Contenu principal -->
-    <VBox spacing="20">
-        <padding>
-            <Insets top="15" right="15" bottom="15" left="15"/>
-        </padding>
+                <Label text="Chiffre d'affaires:"/>
+                <Label fx:id="chiffreAffairesLabel" text="0" style="-fx-text-fill: white; -fx-font-size: 16px;" GridPane.columnIndex="1"/>
 
-        <!-- Cartes métriques -->
-        <GridPane hgap="20" vgap="20">
-            <columnConstraints>
-                <ColumnConstraints percentWidth="33"/>
-                <ColumnConstraints percentWidth="33"/>
-                <ColumnConstraints percentWidth="33"/>
-            </columnConstraints>
-            <rowConstraints>
-                <RowConstraints percentHeight="50"/>
-                <RowConstraints percentHeight="50"/>
-            </rowConstraints>
+                <Label text="Taux d'occupation:" GridPane.rowIndex="1"/>
+                <Label fx:id="tauxOccupationLabel" text="0" style="-fx-text-fill: white; -fx-font-size: 16px;" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
 
-            <!-- Ligne 1 -->
-            <VBox spacing="10" style="-fx-background-color: #3498db; -fx-background-radius: 10;">
-                <padding>
-                    <Insets top="15" right="15" bottom="15" left="15"/>
-                </padding>
-                <Label text="Chiffre d'affaires total" style="-fx-text-fill: white; -fx-font-weight: bold;"/>
-                <Label fx:id="chiffreAffairesLabel" text="0 FCFA" style="-fx-text-fill: white; -fx-font-size: 16px;"/>
-            </VBox>
+                <Label text="Chambre la plus réservée:" GridPane.rowIndex="2"/>
+                <Label fx:id="chambrePlusReserveeLabel" text="-" style="-fx-text-fill: white; -fx-font-size: 16px;" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
 
-            <VBox spacing="10" style="-fx-background-color: #2ecc71; -fx-background-radius: 10;">
-                <padding>
-                    <Insets top="15" right="15" bottom="15" left="15"/>
-                </padding>
-                <Label text="Taux d'occupation moyen" style="-fx-text-fill: white; -fx-font-weight: bold;"/>
-                <Label fx:id="tauxOccupationLabel" text="0%" style="-fx-text-fill: white; -fx-font-size: 16px;"/>
-            </VBox>
+                <Label text="Chambre la moins réservée:" GridPane.rowIndex="3"/>
+                <Label fx:id="chambreMoinsReserveeLabel" text="-" style="-fx-text-fill: white; -fx-font-size: 16px;" GridPane.columnIndex="1" GridPane.rowIndex="3"/>
 
-            <VBox spacing="10" style="-fx-background-color: #e67e22; -fx-background-radius: 10;">
-                <padding>
-                    <Insets top="15" right="15" bottom="15" left="15"/>
-                </padding>
-                <Label text="Chambre la plus réservée" style="-fx-text-fill: white; -fx-font-weight: bold;"/>
-                <Label fx:id="chambrePlusReserveeLabel" text="-" style="-fx-text-fill: white; -fx-font-size: 16px;"/>
-            </VBox>
+                <Label text="Type de chambre le plus demandé:" GridPane.rowIndex="4"/>
+                <Label fx:id="typeChambrePlusDemandeLabel" text="-" style="-fx-text-fill: white; -fx-font-size: 16px;" GridPane.columnIndex="1" GridPane.rowIndex="4"/>
 
-            <!-- Ligne 2 -->
-            <VBox spacing="10" style="-fx-background-color: #9b59b6; -fx-background-radius: 10;">
-                <padding>
-                    <Insets top="15" right="15" bottom="15" left="15"/>
-                </padding>
-                <Label text="Client le plus fidèle" style="-fx-text-fill: white; -fx-font-weight: bold;"/>
-                <Label fx:id="clientPlusFideleLabel" text="-" style="-fx-text-fill: white; -fx-font-size: 16px;"/>
-            </VBox>
+                <Label text="Client le plus fidèle:" GridPane.rowIndex="5"/>
+                <Label fx:id="clientPlusFideleLabel" text="-" style="-fx-text-fill: white; -fx-font-size: 16px;" GridPane.columnIndex="1" GridPane.rowIndex="5"/>
 
-            <VBox spacing="10" style="-fx-background-color: #1abc9c; -fx-background-radius: 10;">
-                <padding>
-                    <Insets top="15" right="15" bottom="15" left="15"/>
-                </padding>
-                <Label text="Durée moyenne de séjour" style="-fx-text-fill: white; -fx-font-weight: bold;"/>
-                <Label fx:id="dureeMoyenneLabel" text="0 nuit(s)" style="-fx-text-fill: white; -fx-font-size: 16px;"/>
-            </VBox>
+                <Label text="Durée moyenne de séjour:" GridPane.rowIndex="6"/>
+                <Label fx:id="dureeMoyenneLabel" text="0" style="-fx-text-fill: white; -fx-font-size: 16px;" GridPane.columnIndex="1" GridPane.rowIndex="6"/>
 
-            <VBox spacing="10" style="-fx-background-color: #c0392b; -fx-background-radius: 10;">
-                <padding>
-                    <Insets top="15" right="15" bottom="15" left="15"/>
-                </padding>
-                <Label text="Nombre d'annulations" style="-fx-text-fill: white; -fx-font-weight: bold;"/>
-                <Label fx:id="annulationsLabel" text="0" style="-fx-text-fill: white; -fx-font-size: 16px;"/>
-            </VBox>
-        </GridPane>
+                <Label text="Nombre d'annulations:" GridPane.rowIndex="7"/>
+                <Label fx:id="annulationsLabel" text="0" style="-fx-text-fill: white; -fx-font-size: 16px;" GridPane.columnIndex="1" GridPane.rowIndex="7"/>
 
-        <!-- Graphiques -->
-        <HBox spacing="20">
-            <VBox spacing="10" prefWidth="33%">
-                <Label text="Évolution des réservations"/>
-                <LineChart fx:id="lineChartReservations" prefHeight="250">
+                <Label text="Nombre de nuits vendues:" GridPane.rowIndex="8"/>
+                <Label fx:id="nbNuitsVenduesLabel" text="0" style="-fx-text-fill: white; -fx-font-size: 16px;" GridPane.columnIndex="1" GridPane.rowIndex="8"/>
+            </GridPane>
+
+            <HBox spacing="20">
+                <!-- LineChart corrigé avec axes -->
+                <LineChart fx:id="lineChartReservations" title="Évolution des réservations" prefWidth="400" prefHeight="300">
                     <xAxis>
                         <CategoryAxis label="Mois"/>
                     </xAxis>
                     <yAxis>
-                        <NumberAxis label="Nombre"/>
+                        <NumberAxis label="Nombre de réservations"/>
                     </yAxis>
                 </LineChart>
-            </VBox>
 
-            <VBox spacing="10" prefWidth="33%">
-                <Label text="Répartition par type de chambre"/>
-                <PieChart fx:id="pieChartTypeChambre" prefHeight="250"/>
-            </VBox>
+                <!-- PieChart (aucune modif nécessaire) -->
+                <PieChart fx:id="pieChartTypeChambre" title="Répartition par type de chambre" prefWidth="300" prefHeight="300"/>
 
-            <VBox spacing="10" prefWidth="33%">
-                <Label text="Occupation par mois"/>
-                <BarChart fx:id="barChartOccupation" prefHeight="250">
+                <!-- BarChart corrigé avec axes -->
+                <BarChart fx:id="barChartOccupation" title="Taux d'occupation par mois" prefWidth="400" prefHeight="300">
                     <xAxis>
                         <CategoryAxis label="Mois"/>
                     </xAxis>
@@ -122,9 +90,7 @@
                         <NumberAxis label="Taux (%)"/>
                     </yAxis>
                 </BarChart>
-            </VBox>
-        </HBox>
-
-    </VBox>
-
+            </HBox>
+        </VBox>
+    </center>
 </BorderPane>

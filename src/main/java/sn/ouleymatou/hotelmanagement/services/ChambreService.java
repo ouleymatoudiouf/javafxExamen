@@ -12,7 +12,8 @@ import sn.ouleymatou.hotelmanagement.utils.JPAUtils;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-
+import java.util.Map;
+import java.time.temporal.ChronoUnit;
 public class ChambreService {
 
     public List<Chambre> lister() {
@@ -232,6 +233,163 @@ public class ChambreService {
             return query.getResultList();
         } finally {
             if (em != null) em.close();
+        }
+    }
+    // Taux d’occupation global (%)
+    public double calculTauxOccupation(LocalDate debut, LocalDate fin) {
+        EntityManager em = JPAUtils.getEntityManager();
+        try {
+            long totalChambres = count(); // nombre total de chambres
+
+            if (totalChambres == 0) return 0.0;
+
+            LocalDateTime start = debut.atStartOfDay();
+            LocalDateTime end = fin.plusDays(1).atStartOfDay();
+
+            // Somme des nuits occupées pour toutes les réservations confirmées/en cours
+            TypedQuery<Long> query = em.createQuery(
+                    "SELECT COALESCE(SUM(r.nombreNuits), 0) FROM Reservation r " +
+                            "WHERE r.dateArrivee >= :debut AND r.dateDepart < :fin " +
+                            "AND r.statut <> :annulee", Long.class);
+            query.setParameter("debut", start);
+            query.setParameter("fin", end);
+            query.setParameter("annulee", Reservation.StatutReservation.ANNULEE);
+            long nuitsOccupees = query.getSingleResult();
+
+            // Nuits totales disponibles = totalChambres * nombre de jours
+            long jours = ChronoUnit.DAYS.between(debut, fin) + 1;
+            long nuitsDisponibles = totalChambres * jours;
+
+            return (double) nuitsOccupees / nuitsDisponibles * 100;
+        } finally {
+            if (em.isOpen()) em.close();
+        }
+    }
+
+    // Taux d’occupation par mois pour BarChart
+    public Map<String, Double> getTauxOccupationParMois(LocalDate debut, LocalDate fin) {
+        EntityManager em = JPAUtils.getEntityManager();
+        try {
+            Map<String, Double> map = new java.util.LinkedHashMap<>();
+            java.text.DateFormatSymbols dfs = new java.text.DateFormatSymbols();
+            String[] moisNoms = dfs.getMonths();
+            long totalChambres = count();
+
+            if (totalChambres == 0) return map;
+
+            LocalDate current = debut.withDayOfMonth(1);
+            LocalDate endDate = fin.withDayOfMonth(1).plusMonths(1);
+
+            while (!current.isAfter(endDate)) {
+                LocalDateTime startMonth = current.atStartOfDay();
+                LocalDateTime endMonth = current.plusMonths(1).atStartOfDay();
+
+                TypedQuery<Long> query = em.createQuery(
+                        "SELECT COALESCE(SUM(r.nombreNuits), 0) FROM Reservation r " +
+                                "WHERE r.dateArrivee >= :start AND r.dateDepart < :end " +
+                                "AND r.statut <> :annulee", Long.class);
+                query.setParameter("start", startMonth);
+                query.setParameter("end", endMonth);
+                query.setParameter("annulee", Reservation.StatutReservation.ANNULEE);
+                long nuitsOccupees = query.getSingleResult();
+
+                long joursDansMois = current.lengthOfMonth();
+                long nuitsDisponibles = totalChambres * joursDansMois;
+
+                double taux = nuitsDisponibles > 0 ? ((double) nuitsOccupees / nuitsDisponibles) * 100 : 0;
+                map.put(moisNoms[current.getMonthValue() - 1] + " " + current.getYear(), taux);
+
+                current = current.plusMonths(1);
+            }
+
+            return map;
+        } finally {
+            if (em.isOpen()) em.close();
+        }
+    }
+
+    // Chambre la plus réservée
+    public Chambre getChambreLaPlusReservee(LocalDate debut, LocalDate fin) {
+        EntityManager em = JPAUtils.getEntityManager();
+        try {
+            LocalDateTime start = debut.atStartOfDay();
+            LocalDateTime end = fin.plusDays(1).atStartOfDay();
+
+            TypedQuery<Object[]> query = em.createQuery(
+                    "SELECT r.chambre, COUNT(r) FROM Reservation r " +
+                            "WHERE r.dateReservation >= :debut AND r.dateReservation < :fin " +
+                            "GROUP BY r.chambre ORDER BY COUNT(r) DESC", Object[].class);
+            query.setParameter("debut", start);
+            query.setParameter("fin", end);
+            List<Object[]> result = query.setMaxResults(1).getResultList();
+            return result.isEmpty() ? null : (Chambre) result.get(0)[0];
+        } finally {
+            if (em.isOpen()) em.close();
+        }
+    }
+
+    // Chambre la moins réservée
+    public Chambre getChambreLaMoinsReservee(LocalDate debut, LocalDate fin) {
+        EntityManager em = JPAUtils.getEntityManager();
+        try {
+            LocalDateTime start = debut.atStartOfDay();
+            LocalDateTime end = fin.plusDays(1).atStartOfDay();
+
+            TypedQuery<Object[]> query = em.createQuery(
+                    "SELECT r.chambre, COUNT(r) FROM Reservation r " +
+                            "WHERE r.dateReservation >= :debut AND r.dateReservation < :fin " +
+                            "GROUP BY r.chambre ORDER BY COUNT(r) ASC", Object[].class);
+            query.setParameter("debut", start);
+            query.setParameter("fin", end);
+            List<Object[]> result = query.setMaxResults(1).getResultList();
+            return result.isEmpty() ? null : (Chambre) result.get(0)[0];
+        } finally {
+            if (em.isOpen()) em.close();
+        }
+    }
+
+    // Type de chambre le plus demandé
+    public String getTypeChambreLePlusDemande(LocalDate debut, LocalDate fin) {
+        EntityManager em = JPAUtils.getEntityManager();
+        try {
+            LocalDateTime start = debut.atStartOfDay();
+            LocalDateTime end = fin.plusDays(1).atStartOfDay();
+
+            TypedQuery<Object[]> query = em.createQuery(
+                    "SELECT r.chambre.typeChambre.libelle, COUNT(r) FROM Reservation r " +
+                            "WHERE r.dateReservation >= :debut AND r.dateReservation < :fin " +
+                            "GROUP BY r.chambre.typeChambre.libelle ORDER BY COUNT(r) DESC", Object[].class);
+            query.setParameter("debut", start);
+            query.setParameter("fin", end);
+            List<Object[]> result = query.setMaxResults(1).getResultList();
+            return result.isEmpty() ? "-" : (String) result.get(0)[0];
+        } finally {
+            if (em.isOpen()) em.close();
+        }
+    }
+
+    // Réservations par type de chambre (pour PieChart)
+    public Map<String, Integer> getReservationsParTypeChambre(LocalDate debut, LocalDate fin) {
+        EntityManager em = JPAUtils.getEntityManager();
+        try {
+            Map<String, Integer> map = new java.util.LinkedHashMap<>();
+            LocalDateTime start = debut.atStartOfDay();
+            LocalDateTime end = fin.plusDays(1).atStartOfDay();
+
+            TypedQuery<Object[]> query = em.createQuery(
+                    "SELECT r.chambre.typeChambre.libelle, COUNT(r) FROM Reservation r " +
+                            "WHERE r.dateReservation >= :debut AND r.dateReservation < :fin " +
+                            "GROUP BY r.chambre.typeChambre.libelle", Object[].class);
+            query.setParameter("debut", start);
+            query.setParameter("fin", end);
+            List<Object[]> results = query.getResultList();
+
+            for (Object[] row : results) {
+                map.put((String) row[0], ((Number) row[1]).intValue());
+            }
+            return map;
+        } finally {
+            if (em.isOpen()) em.close();
         }
     }
 

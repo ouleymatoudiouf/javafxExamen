@@ -11,7 +11,10 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ReservationService {
 
@@ -262,4 +265,138 @@ public class ReservationService {
             if (em.isOpen()) em.close();
         }
     }
+
+    // Chiffre d’affaires entre deux dates
+    public double calculChiffreAffaires(LocalDate debut, LocalDate fin) {
+        EntityManager em = JPAUtils.getEntityManager();
+        try {
+            LocalDateTime start = debut.atStartOfDay();
+            LocalDateTime end = fin.plusDays(1).atStartOfDay();
+            TypedQuery<Double> query = em.createQuery(
+                    "SELECT COALESCE(SUM(r.montantTotal), 0) FROM Reservation r WHERE r.dateArrivee >= :start AND r.dateArrivee < :end",
+                    Double.class
+            );
+            query.setParameter("start", start);
+            query.setParameter("end", end);
+            return query.getSingleResult();
+        } finally {
+            if (em.isOpen()) em.close();
+        }
+    }
+
+    // Client ayant le plus de réservations
+    public String getClientLePlusFidele(LocalDate debut, LocalDate fin) {
+        EntityManager em = JPAUtils.getEntityManager();
+        try {
+            LocalDateTime start = debut.atStartOfDay();
+            LocalDateTime end = fin.plusDays(1).atStartOfDay();
+            TypedQuery<Object[]> query = em.createQuery(
+                    "SELECT r.nomClient, r.prenomClient, COUNT(r) FROM Reservation r " +
+                            "WHERE r.dateArrivee >= :start AND r.dateArrivee < :end " +
+                            "GROUP BY r.nomClient, r.prenomClient ORDER BY COUNT(r) DESC",
+                    Object[].class
+            );
+            query.setParameter("start", start);
+            query.setParameter("end", end);
+            query.setMaxResults(1);
+            List<Object[]> result = query.getResultList();
+            if (!result.isEmpty()) {
+                Object[] row = result.get(0);
+                return row[0] + " " + row[1];
+            }
+            return null;
+        } finally {
+            if (em.isOpen()) em.close();
+        }
+    }
+
+    // Durée moyenne de séjour
+    public double getDureeMoyenneSejour(LocalDate debut, LocalDate fin) {
+        EntityManager em = JPAUtils.getEntityManager();
+        try {
+            LocalDateTime start = debut.atStartOfDay();
+            LocalDateTime end = fin.plusDays(1).atStartOfDay();
+            TypedQuery<Double> query = em.createQuery(
+                    "SELECT COALESCE(AVG(r.nombreNuits), 0) FROM Reservation r " +
+                            "WHERE r.dateArrivee >= :start AND r.dateArrivee < :end",
+                    Double.class
+            );
+            query.setParameter("start", start);
+            query.setParameter("end", end);
+            return query.getSingleResult();
+        } finally {
+            if (em.isOpen()) em.close();
+        }
+    }
+
+    // Nombre d’annulations
+    public int getNombreAnnulations(LocalDate debut, LocalDate fin) {
+        EntityManager em = JPAUtils.getEntityManager();
+        try {
+            LocalDateTime start = debut.atStartOfDay();
+            LocalDateTime end = fin.plusDays(1).atStartOfDay();
+            TypedQuery<Long> query = em.createQuery(
+                    "SELECT COUNT(r) FROM Reservation r WHERE r.statut = :annulee AND r.dateArrivee >= :start AND r.dateArrivee < :end",
+                    Long.class
+            );
+            query.setParameter("annulee", Reservation.StatutReservation.ANNULEE);
+            query.setParameter("start", start);
+            query.setParameter("end", end);
+            return query.getSingleResult().intValue();
+        } finally {
+            if (em.isOpen()) em.close();
+        }
+    }
+
+    // Nombre total de nuits vendues
+    public int getNombreNuitsVendues(LocalDate debut, LocalDate fin) {
+        EntityManager em = JPAUtils.getEntityManager();
+        try {
+            LocalDateTime start = debut.atStartOfDay();
+            LocalDateTime end = fin.plusDays(1).atStartOfDay();
+            TypedQuery<Long> query = em.createQuery(
+                    "SELECT COALESCE(SUM(r.nombreNuits), 0) FROM Reservation r WHERE r.dateArrivee >= :start AND r.dateArrivee < :end",
+                    Long.class
+            );
+            query.setParameter("start", start);
+            query.setParameter("end", end);
+            return query.getSingleResult().intValue();
+        } finally {
+            if (em.isOpen()) em.close();
+        }
+    }
+    // Réservations par mois (pour LineChart)
+    public Map<String, Integer> getNombreReservationsParMois(LocalDate debut, LocalDate fin) {
+        EntityManager em = JPAUtils.getEntityManager();
+        try {
+            LocalDateTime start = debut.atStartOfDay();
+            LocalDateTime end = fin.plusDays(1).atStartOfDay();
+
+            TypedQuery<Object[]> query = em.createQuery(
+                    "SELECT EXTRACT(MONTH FROM r.dateArrivee), COUNT(r) " +
+                            "FROM Reservation r " +
+                            "WHERE r.dateArrivee >= :start AND r.dateArrivee < :end " +
+                            "GROUP BY EXTRACT(MONTH FROM r.dateArrivee) " +
+                            "ORDER BY EXTRACT(MONTH FROM r.dateArrivee)",
+                    Object[].class
+            );
+
+            query.setParameter("start", start);
+            query.setParameter("end", end);
+
+            List<Object[]> resultList = query.getResultList();
+
+            Map<String, Integer> stats = new LinkedHashMap<>(); // pour garder l'ordre des mois
+            for (Object[] row : resultList) {
+                int mois = ((Number) row[0]).intValue();
+                String moisNom = java.time.Month.of(mois).name();
+                stats.put(moisNom, ((Number) row[1]).intValue());
+            }
+            return stats;
+        } finally {
+            if (em.isOpen()) em.close();
+        }
+    }
+
+
 }
