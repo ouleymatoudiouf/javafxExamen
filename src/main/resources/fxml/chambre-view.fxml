@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+            fx:controller="sn.ouleymatou.hotelmanagement.controllers.ChambreController">
+
+    <!-- Top : Barre de navigation + Actions -->
+    <top>
+        <VBox spacing="5">
+            <!-- Barre de navigation -->
+            <HBox spacing="20" alignment="CENTER_LEFT" style="-fx-background-color: #f0f0f0;">
+                <padding>
+                    <Insets top="10" bottom="10" left="15" right="15"/>
+                </padding>
+                <Button text="⮐ Retour" onAction="#handleRetour"/>
+                <Label text="Gestion des Chambres">
+                    <font>
+                        <Font name="System Bold" size="20"/>
+                    </font>
+                </Label>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button text="⨁ Nouvelle Chambre" onAction="#handleNouvelleChambre"
+                        style="-fx-background-color: #27ae60; -fx-text-fill: white;"/>
+            </HBox>
+
+            <!-- Filtres + Export -->
+            <HBox spacing="10" alignment="CENTER_LEFT" style="-fx-background-color: #f0f0f0;">
+                <padding>
+                    <Insets top="10" bottom="10" left="15" right="15"/>
+                </padding>
+                <ComboBox fx:id="statutComboBox" promptText="Filtrer par statut"/>
+                <ComboBox fx:id="typeComboBox" promptText="Filtrer par type"/>
+                <Button text="Filtrer" onAction="#handleFiltrer"
+                        style="-fx-background-color: #2980b9; -fx-text-fill: white;"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button text="Export PDF" onAction="#handleExportPDF"
+                        style="-fx-background-color: #c0392b; -fx-text-fill: white;"/>
+                <Button text="Export Excel" onAction="#handleExportExcel"
+                        style="-fx-background-color: #16a085; -fx-text-fill: white;"/>
+            </HBox>
+        </VBox>
+    </top>
+
+    <!-- Center : Table -->
+    <center>
+        <VBox spacing="10">
+            <padding>
+                <Insets top="10" bottom="10" left="15" right="15"/>
+            </padding>
+
+            <TableView fx:id="chambreTable" prefHeight="450">
+                <columns>
+                    <TableColumn fx:id="numeroColumn" text="Numéro" prefWidth="120"/>
+                    <TableColumn fx:id="typeColumn" text="Type" prefWidth="150"/>
+                    <TableColumn fx:id="statutColumn" text="Statut" prefWidth="150"/>
+                    <TableColumn fx:id="actionColumn" text="Actions" prefWidth="220"/>
+                </columns>
+            </TableView>
+
+            <Label fx:id="totalLabel" text="Total : 0" style="-fx-font-weight: bold;"/>
+        </VBox>
+    </center>
+</BorderPane>

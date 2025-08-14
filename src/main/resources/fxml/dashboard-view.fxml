@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="sn.ouleymatou.hotelmanagement.controllers.DashboardController">
+
+    <!-- En-tête -->
+    <top>
+        <HBox spacing="20" alignment="CENTER_LEFT" style="-fx-background-color: #2c3e50;">
+            <padding>
+                <Insets top="15" right="15" bottom="15" left="15"/>
+            </padding>
+            <Label text="🏨" style="-fx-font-size: 24px;"/>
+            <VBox spacing="5">
+                <Label text="ROYAL PALACE HOTEL"
+                       style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: white;"/>
+                <Label text="Système de Gestion Hôtelière"
+                       style="-fx-text-fill: gray;"/>
+            </VBox>
+            <Pane HBox.hgrow="ALWAYS"/>
+            <Label fx:id="welcomeLabel"
+                   text="Bienvenue, [Nom Utilisateur]"
+                   style="-fx-text-fill: white; -fx-font-size: 14px;"/>
+            <Button fx:id="logoutBtn"
+                    text="Déconnexion"
+                    style="-fx-background-color: red; -fx-text-fill: white;"
+                    onAction="#handleLogout"/>
+        </HBox>
+    </top>
+
+    <!-- Zone centrale -->
+    <center>
+        <VBox spacing="40" alignment="TOP_CENTER" style="-fx-background-color: #ecf0f1;">
+            <padding>
+                <Insets top="30" right="30" bottom="30" left="30"/>
+            </padding>
+
+            <!-- Cartes Statistiques -->
+            <HBox spacing="30" alignment="CENTER">
+
+                <!-- Carte Chambres -->
+                <VBox fx:id="boxChambres" alignment="CENTER" spacing="10"
+                      styleClass="dashboard-card"
+                      style="-fx-background-color: #3498db;">
+                    <Label text="🏠" style="-fx-font-size: 24px; -fx-text-fill: white;"/>
+                    <Label fx:id="labelTotalChambresValue" text="6"
+                           style="-fx-text-fill: white; -fx-font-size: 22px; -fx-font-weight: bold;"/>
+                    <Label text="Total Chambres"
+                           style="-fx-text-fill: white; -fx-font-size: 16px;"/>
+                </VBox>
+
+                <!-- Carte Réservations -->
+                <VBox fx:id="boxReservations" alignment="CENTER" spacing="10"
+                      styleClass="dashboard-card"
+                      style="-fx-background-color: #27ae60;">
+                    <Label text="📅" style="-fx-font-size: 24px; -fx-text-fill: white;"/>
+                    <Label fx:id="labelReservationsActivesValue" text="12"
+                           style="-fx-text-fill: white; -fx-font-size: 22px; -fx-font-weight: bold;"/>
+                    <Label text="Réservations Actives"
+                           style="-fx-text-fill: white; -fx-font-size: 16px;"/>
+                </VBox>
+
+                <!-- Carte Statistiques -->
+                <VBox fx:id="boxStatistiques" alignment="CENTER" spacing="10"
+                      styleClass="dashboard-card"
+                      style="-fx-background-color: #f39c12;">
+                    <Label text="📊" style="-fx-font-size: 24px; -fx-text-fill: white;"/>
+                    <Label fx:id="labelTauxOccupationValue" text="75%"
+                           style="-fx-text-fill: white; -fx-font-size: 22px; -fx-font-weight: bold;"/>
+                    <Label text="Taux d'Occupation"
+                           style="-fx-text-fill: white; -fx-font-size: 16px;"/>
+                </VBox>
+            </HBox>
+
+            <!-- Menu principal -->
+            <HBox spacing="40" alignment="CENTER">
+                <Button text="🏠 Gestion Chambres"
+                        onAction="#handleChambres"
+                        style="-fx-font-size: 14px; -fx-padding: 15 25;"/>
+                <Button text="📅 Réservations"
+                        onAction="#handleReservations"
+                        style="-fx-font-size: 14px; -fx-padding: 15 25;"/>
+                <Button text="📊 Statistiques"
+                        onAction="#handleStatistiques"
+                        style="-fx-font-size: 14px; -fx-padding: 15 25;"/>
+            </HBox>
+        </VBox>
+    </center>
+
+    <!-- Pied de page -->
+    <bottom>
+        <HBox alignment="CENTER" style="-fx-background-color: #2c3e50;">
+            <padding>
+                <Insets top="10" right="10" bottom="10" left="10"/>
+            </padding>
+            <Label text="© 2025 ROYAL PALACE HOTEL" style="-fx-text-fill: white;"/>
+        </HBox>
+    </bottom>
+
+</BorderPane>

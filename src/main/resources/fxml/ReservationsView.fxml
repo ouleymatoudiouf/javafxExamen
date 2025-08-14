@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.geometry.Pos?>
+<?import javafx.collections.FXCollections?>
+<?import java.lang.String?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml"
+            fx:controller="sn.ouleymatou.hotelmanagement.controllers.ReservationController">
+
+    <!-- Haut : Bandeau titre + Onglets + Filtres -->
+    <top>
+        <VBox>
+            <!-- Ligne titre et boutons -->
+            <HBox alignment="CENTER_LEFT" spacing="10" style="-fx-background-color: #2c3e50; -fx-padding: 10;">
+                <Button text="← Retour" fx:id="btnRetour" onAction="#handleRetour"
+                        style="-fx-background-color: #3498db; -fx-text-fill: white;"/>
+                <VBox alignment="CENTER_LEFT" spacing="3">
+                    <Label text="Gestion des Reservations" style="-fx-text-fill: white; -fx-font-size: 18; -fx-font-weight: bold;"/>
+                    <Label text="Creer, modifier et gerer les reservations" style="-fx-text-fill: white;"/>
+                </VBox>
+                <Pane HBox.hgrow="ALWAYS"/>
+                <Button text="+ Nouvelle Reservation" fx:id="btnNouvelleReservation"
+                        onAction="#handleNouvelleReservation"
+                        style="-fx-background-color: #27ae60; -fx-text-fill: white;"/>
+            </HBox>
+
+            <!-- Onglets -->
+            <TabPane fx:id="tabPaneReservations" tabClosingPolicy="UNAVAILABLE">
+                <tabs>
+                    <Tab text="Toutes les Reservations"/>
+                    <Tab text="Arrivees du Jour"/>
+                    <Tab text="Departs du Jour"/>
+                </tabs>
+            </TabPane>
+
+            <!-- Barre de filtres -->
+            <HBox spacing="10" alignment="CENTER_LEFT" style="-fx-padding: 10; -fx-background-color: #ecf0f1;">
+                <Label text="Date début:"/>
+                <DatePicker fx:id="dateDebut"/>
+                <TextField fx:id="heureDebut" promptText="HH:mm" prefWidth="60"/>
+
+                <Label text="Date fin:"/>
+                <DatePicker fx:id="dateFin"/>
+                <TextField fx:id="heureFin" promptText="HH:mm" prefWidth="60"/>
+
+                <Label text="Statut:"/>
+                <ComboBox fx:id="statutFilter" prefWidth="150">
+                    <items>
+                        <FXCollections fx:factory="observableArrayList">
+                            <String fx:value="Tous"/>
+                            <String fx:value="Confirmee"/>
+                            <String fx:value="Annulee"/>
+                            <String fx:value="Check-in"/>
+                            <String fx:value="Check-out"/>
+                        </FXCollections>
+                    </items>
+                </ComboBox>
+
+                <Label text="Recherche:"/>
+                <TextField fx:id="recherche" promptText="Client, N° reservation, Chambre"/>
+                <Button text="Filtrer" onAction="#handleFiltrer"/>
+            </HBox>
+        </VBox>
+    </top>
+
+    <!-- Centre : ComboBox chambres + Tableau principal -->
+    <center>
+        <VBox spacing="10" alignment="TOP_LEFT" style="-fx-padding: 10;">
+            <!-- ComboBox pour sélectionner une chambre -->
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <Label text="Chambre:"/>
+                <ComboBox fx:id="chambreComboBox" prefWidth="200" promptText="Sélectionnez une chambre"/>
+            </HBox>
+
+            <!-- Tableau des réservations -->
+            <TableView fx:id="tableReservations" prefHeight="400">
+                <columns>
+                    <TableColumn text="N° Reservation" fx:id="colNumReservation"/>
+                    <TableColumn text="Client" fx:id="colClient"/>
+                    <TableColumn text="Chambre" fx:id="colChambre"/>
+                    <TableColumn text="Arrivee" fx:id="colArrivee"/>
+                    <TableColumn text="Depart" fx:id="colDepart"/>
+                    <TableColumn text="Nuits" fx:id="colNuits"/>
+                    <TableColumn text="Statut" fx:id="colStatut"/>
+                    <TableColumn text="Montant" fx:id="colMontant"/>
+                    <TableColumn text="Actions" fx:id="colActions"/>
+                </columns>
+            </TableView>
+        </VBox>
+    </center>
+
+    <!-- Bas : Statistiques -->
+    <bottom>
+        <HBox spacing="50" alignment="CENTER" style="-fx-padding: 15; -fx-background-color: #f7f7f7;">
+            <Label fx:id="lblTotalReservations" text="156 Total Reservations" style="-fx-font-weight: bold;"/>
+            <Label fx:id="lblArriveesAujourdHui" text="8 Arrivees Aujourd'hui" style="-fx-font-weight: bold;"/>
+            <Label fx:id="lblDepartsAujourdHui" text="5 Departs Aujourd'hui" style="-fx-font-weight: bold;"/>
+            <Label fx:id="lblChiffreAffaires" text="485 000 FCFA CA Aujourd'hui" style="-fx-font-weight: bold; -fx-text-fill: orange;"/>
+        </HBox>
+    </bottom>
+
+</BorderPane>

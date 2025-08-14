@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<DialogPane xmlns:fx="http://javafx.com/fxml"
+            fx:controller="sn.ouleymatou.hotelmanagement.controllers.AddChambreDialogController">
+
+    <content>
+        <VBox spacing="12.0">
+            <padding>
+                <Insets top="15" right="15" bottom="15" left="15"/>
+            </padding>
+
+            <GridPane hgap="10" vgap="10">
+                <Label text="Type de chambre:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                <ComboBox fx:id="typeComboBox" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+
+                <Label text="Étage:" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                <ComboBox fx:id="etageComboBox" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+
+                <Label text="Climatisation:" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+                <CheckBox fx:id="climCheckBox" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+
+                <Label text="Balcon:" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+                <CheckBox fx:id="balconCheckBox" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+
+                <Label text="Vue sur l'océan:" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
+                <CheckBox fx:id="vueOceanCheckBox" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
+
+                <!-- ✅ Champ ajouté -->
+                <Label text="Date de dernière rénovation:" GridPane.rowIndex="5" GridPane.columnIndex="0"/>
+                <DatePicker fx:id="dateDerniereRenovation" GridPane.rowIndex="5" GridPane.columnIndex="1"/>
+            </GridPane>
+        </VBox>
+    </content>
+
+    <buttonTypes>
+        <ButtonType fx:id="setDialogResultConverter" text="Ajouter" buttonData="OK_DONE"/>
+        <ButtonType text="Annuler" buttonData="CANCEL_CLOSE"/>
+    </buttonTypes>
+</DialogPane>

@@ -1,0 +1,37 @@
+<persistence xmlns="http://xmlns.jcp.org/xml/ns/persistence" version="2.2">
+    <persistence-unit name="PERSISTENCE_MYSQL">
+        <description>Hibernate JPA Configuration Example</description>
+        <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
+        <properties>
+            <property name="javax.persistence.jdbc.driver" value="com.mysql.cj.jdbc.Driver"/>
+            <property name="javax.persistence.jdbc.url" value="jdbc:mysql://localhost:3306/hotels"/>
+            <property name="javax.persistence.jdbc.user" value="root"/>
+            <property name="javax.persistence.jdbc.password" value="root"/>
+            <property name="hibernate.show_sql" value="true"/>
+            <property name="hibernate.hbm2ddl.auto" value="update"/>
+        </properties>
+    </persistence-unit>
+
+    <persistence-unit name="PERSISTENCE_POSTGRES">
+        <description>Hibernate JPA Configuration for PostgreSQL</description>
+        <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
+
+        <!-- Déclaration des entités -->
+        <class>sn.ouleymatou.hotelmanagement.entities.User</class>
+        <class>sn.ouleymatou.hotelmanagement.entities.Chambre</class>
+        <class>sn.ouleymatou.hotelmanagement.entities.TypeChambre</class>
+        <class>sn.ouleymatou.hotelmanagement.entities.Reservation</class>
+
+        <properties>
+            <property name="jakarta.persistence.jdbc.driver" value="org.postgresql.Driver"/>
+            <property name="jakarta.persistence.jdbc.url" value="jdbc:postgresql://localhost:5432/examenHotel"/>
+            <property name="jakarta.persistence.jdbc.user" value="postgres"/>
+            <property name="jakarta.persistence.jdbc.password" value="ouley"/>
+            <property name="hibernate.show_sql" value="true"/>
+            <property name="hibernate.hbm2ddl.auto" value="update"/>
+            <property name="hibernate.format_sql" value="true"/>
+            <property name="hibernate.use_sql_comments" value="true"/>
+
+        </properties>
+    </persistence-unit>
+</persistence>

@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.Circle?>
+
+<AnchorPane xmlns:fx="http://javafx.com/fxml"
+            fx:controller="sn.ouleymatou.hotelmanagement.controllers.AddReservationDialogController"
+            prefWidth="600" prefHeight="700">
+
+    <VBox spacing="20" AnchorPane.topAnchor="10" AnchorPane.bottomAnchor="10"
+          AnchorPane.leftAnchor="10" AnchorPane.rightAnchor="10">
+
+        <!-- Header -->
+        <HBox style="-fx-background-color: #e67e22; -fx-padding: 15 20 15 20; -fx-background-radius: 10;">
+            <Label text="🗓️ Nouvelle Réservation" style="-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 18px;" />
+            <Region HBox.hgrow="ALWAYS"/>
+            <Label text="Assistant de création de réservation" style="-fx-text-fill: white; -fx-font-size: 12px;"/>
+        </HBox>
+
+        <!-- Étapes numérotées -->
+        <HBox spacing="40" alignment="CENTER">
+            <VBox alignment="CENTER">
+                <Circle radius="15" fill="#2980b9" />
+                <Label text="Client" style="-fx-text-fill: #2980b9; -fx-font-weight: bold;"/>
+            </VBox>
+            <Label text="→" style="-fx-font-weight: bold; -fx-font-size: 18px;"/>
+            <VBox alignment="CENTER">
+                <Circle radius="15" fill="#bdc3c7" />
+                <Label text="Dates" style="-fx-text-fill: #7f8c8d;"/>
+            </VBox>
+            <Label text="→" style="-fx-font-weight: bold; -fx-font-size: 18px;"/>
+            <VBox alignment="CENTER">
+                <Circle radius="15" fill="#bdc3c7" />
+                <Label text="Chambre" style="-fx-text-fill: #7f8c8d;"/>
+            </VBox>
+            <Label text="→" style="-fx-font-weight: bold; -fx-font-size: 18px;"/>
+            <VBox alignment="CENTER">
+                <Circle radius="15" fill="#bdc3c7" />
+                <Label text="Confirmation" style="-fx-text-fill: #7f8c8d;"/>
+            </VBox>
+        </HBox>
+
+        <!-- Étapes contenu -->
+        <StackPane fx:id="etapesPane" prefHeight="450" style="-fx-background-color: #f9f9f9; -fx-padding: 20; -fx-background-radius: 10;">
+
+            <!-- Étape 1 : Informations Client -->
+            <VBox fx:id="etape1" spacing="10" visible="true">
+                <Label text="Informations du Client" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+                <GridPane hgap="15" vgap="10">
+                    <columnConstraints>
+                        <ColumnConstraints percentWidth="50"/>
+                        <ColumnConstraints percentWidth="50"/>
+                    </columnConstraints>
+
+                    <Label text="Nom :" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+                    <TextField fx:id="nomField" promptText="Nom du client" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+
+                    <Label text="Prénom :" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+                    <TextField fx:id="prenomField" promptText="Prénom du client" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+
+                    <Label text="Téléphone :" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+                    <TextField fx:id="telephoneField" promptText="77 123 45 67" GridPane.columnIndex="0" GridPane.rowIndex="3" />
+
+                    <Label text="Email (optionnel) :" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+                    <TextField fx:id="emailField" promptText="client@email.com" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                </GridPane>
+            </VBox>
+
+            <!-- Étape 2 : Dates & Nb Personnes -->
+            <VBox fx:id="etape2" spacing="10" visible="false">
+                <Label text="Dates de Séjour" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+                <GridPane hgap="15" vgap="10">
+                    <columnConstraints>
+                        <ColumnConstraints percentWidth="50"/>
+                        <ColumnConstraints percentWidth="50"/>
+                    </columnConstraints>
+
+                    <!-- Date et heure d'arrivée -->
+                    <Label text="Date d'arrivée :" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+                    <DatePicker fx:id="dateArriveePicker" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+                    <Label text="Heure :" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+                    <Spinner fx:id="heureArriveeSpinner" GridPane.columnIndex="0" GridPane.rowIndex="3"/>
+                    <Spinner fx:id="minuteArriveeSpinner" GridPane.columnIndex="0" GridPane.rowIndex="4"/>
+
+                    <!-- Date et heure de départ -->
+                    <Label text="Date de départ :" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+                    <DatePicker fx:id="dateDepartPicker" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+                    <Label text="Heure :" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+                    <Spinner fx:id="heureDepartSpinner" GridPane.columnIndex="1" GridPane.rowIndex="3"/>
+                    <Spinner fx:id="minuteDepartSpinner" GridPane.columnIndex="1" GridPane.rowIndex="4"/>
+
+                    <!-- Nombre de personnes -->
+                    <Label text="Nombre de personnes" GridPane.columnIndex="0" GridPane.rowIndex="5"/>
+                    <Spinner fx:id="nbPersonnesSpinner" prefWidth="150" GridPane.columnIndex="0" GridPane.rowIndex="6"/>
+                </GridPane>
+            </VBox>
+
+            <!-- Étape 3 : Sélection Chambre -->
+            <VBox fx:id="etape3" spacing="10" visible="false">
+                <Label text="Choix de la Chambre" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+                <ComboBox fx:id="chambreComboBox" promptText="Sélectionnez une chambre" prefWidth="300"/>
+                <HBox spacing="20">
+                    <Label fx:id="labelNuits" text="0 nuit(s)" />
+                    <Label fx:id="labelMontant" text="0 FCFA" />
+                </HBox>
+            </VBox>
+
+            <!-- Étape 4 : Confirmation -->
+            <VBox fx:id="etape4" spacing="10" visible="false">
+                <Label text="Confirmation" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+                <HBox spacing="10" alignment="CENTER_LEFT">
+                    <Label text="Montant total :" />
+                    <Label fx:id="labelMontantTotal" text="0 FCFA"/>
+                </HBox>
+                <TextField fx:id="acompteField" promptText="Acompte versé (min. 30%)" />
+            </VBox>
+        </StackPane>
+
+        <!-- Navigation -->
+        <HBox spacing="10" alignment="center">
+            <Button fx:id="btnPrecedent" text="⬅ Précédent" onAction="#handlePrecedent"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button fx:id="btnSuivant" text="Suivant ➡" onAction="#handleSuivant"/>
+        </HBox>
+        <HBox alignment="CENTER_RIGHT">
+            <padding>
+                <Insets top="15" right="15" bottom="15" left="15"/>
+            </padding>
+            <Button fx:id="btnConfirmer" text="Confirmer" onAction="#handleReserver" visible="false" />
+        </HBox>
+
+    </VBox>
+</AnchorPane>
